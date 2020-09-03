@@ -1,6 +1,7 @@
 from socket_control import socket_control
+from pattern_generator import *
+from sensor_control import *
 
-import wiznet_register_commands
 IDENTIFY = "*idn?"
 RESET = "*rst"
 REGISTER = "syst:reg"
@@ -13,12 +14,14 @@ class wiz_scpi(socket_control):
         self.Firmware = None
         self.Identity = None
 
+        self.apg = pattern_generator(self)
+        self.sensor = sensor_control(self)
+
     def connect(self):
         super().connect()
         if self.Socket:
             self.get_firmware()
             self.get_identity()
-            self.apg = pattern_generator(self.Socket)
 
     def get_firmware(self):
         self.Firmware = self.send(f"{FIRMWARE}?")
