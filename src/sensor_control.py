@@ -8,30 +8,8 @@ TRIGGER_PRESENT = "sens:trig:pres"
 TIMESTAMP = "sens:timestamp"
 
 import on_off_classes as on_off
-from enum import Enum
-class TriggerSelectOptions(Enum):
-    NONE = 0, 
-    FMH = 1, 
-    FMV = 2, 
-    FMB = 3, 
-    ZTCH = 4,
-    ZTCV = 5, 
-    ZTCB = 6, 
-    POLH = 7, 
-    POLV = 8, 
-    SFMH = 9, 
-    SFMV = 10, 
-    SZTCH = 11, 
-    SZTCV = 12, 
-    BFMH = 13, 
-    BFMV = 14, 
-    BZTCH = 15, 
-    BZTCV = 16, 
-    SFMSBLKH = 17, 
-    SFMSBLKV = 18, 
-    SZTCSBLKH = 19, 
-    SZTCSBLKV = 20, 
 
+from enum import Enum
 
 class sensor_control:
     def __init__(self, client):
@@ -45,7 +23,6 @@ class sensor_control:
         print(tempString)
         return self.client.send(tempString)
         
-
     def get_sensor_power(self, sensor):
         chValue = to_channel(sensor)
 
@@ -75,18 +52,32 @@ class sensor_control:
         tempString = f"{TRIGGER_SELECT}? {chValue}"
         return self.client.send(tempString, toLog)
 
-    
-    def get_triggGetTriggerState(int sensor, toLog = True):
-        var chValue = f"ch{sensor}"
-        var tempString = f"{WiznetSensorCommands.TRIGGER_STATE}? {chValue}"
-        var resp =  await Send(tempString, toLog)
+    def get_trigger_state(self, sensor, toLog = True):
+        chValue = to_channel(sensor)
+        tempString = f"{TRIGGER_STATE}? {chValue}"
+        resp =  self.client.send(tempString, toLog)
 
-        if (int.TryParse(resp, out var result))
-        {
-            return ((TriggerState)result).ToString()
-        }
-        return TriggerState.Reset.ToString()
-    }
+        try:
+            state = TriggerState(int(resp))
+            return state
+        finally:
+            print(resp)
+    
+    def get_triggers_present(self, toLog = True):
+        tempString = f"{TRIGGER_PRESENT}?"
+        resp = self.client.send(tempString, toLog)
+        fm = False
+        ztc = False
+        pol = False
+        irig = False
+
+        try:
+            data = int(resp)
+        finally:
+            pass
+
+
+
 
         # public async Task<TriggersPresent> GetTriggerPresent(toLog = True):
         #     var tempString = f"{WiznetSensorCommands.TRIGGER_PRESENT}?"
@@ -148,6 +139,9 @@ class sensor_control:
         #     return new SensorStatus(power, oc)
         # }
 
+        def get_sensor_timestamp(self, sensor, toLog = True):
+            pass
+
         # def GetSensorTimestamp(int sensor, toLog = True):
         #     var chValue = f"ch{sensor}"
         #     var tempString = f"{WiznetSensorCommands.TIMESTAMP}? {chValue}"
@@ -193,3 +187,33 @@ class sensor_control:
             return on_off.on_off_to_string(setting)
         except:
             return setting
+
+class TriggerSelectOptions(Enum):
+    NONE = 0, 
+    FMH = 1, 
+    FMV = 2, 
+    FMB = 3, 
+    ZTCH = 4,
+    ZTCV = 5, 
+    ZTCB = 6, 
+    POLH = 7, 
+    POLV = 8, 
+    SFMH = 9, 
+    SFMV = 10, 
+    SZTCH = 11, 
+    SZTCV = 12, 
+    BFMH = 13, 
+    BFMV = 14, 
+    BZTCH = 15, 
+    BZTCV = 16, 
+    SFMSBLKH = 17, 
+    SFMSBLKV = 18, 
+    SZTCSBLKH = 19, 
+    SZTCSBLKV = 20, 
+
+class TriggerState(Enum):
+    Reset = 0,
+    Ready = 1,
+    Triggered = 2,
+    Pulse = 3,
+    Continuous = 4
