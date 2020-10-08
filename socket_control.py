@@ -68,11 +68,11 @@ class socket_control:
                 return self.receive()
         return 'Not Connected'
 
-    def recv(self, MaxBytes=2048):
+    def receive(self, MaxBytes=2048):
         if self.is_connected:
             if version == 3:
                 try:
-                    ByteString = self.Socket.recv(MaxBytes)
+                    ByteString = self._socket.recv(MaxBytes)
                 except socket.timeout as stex:
                     ByteString = b'-1'
                 except ConnectionResetError:
@@ -83,7 +83,7 @@ class socket_control:
                 return String
             else:
                 try:
-                    ByteString = self.Socket.recv(MaxBytes)
+                    ByteString = self._socket.recv(MaxBytes)
                 except socket.timeout as stex:
                     ByteString = b'-1'
                 except ConnectionResetError:
@@ -124,6 +124,8 @@ if __name__ == "__main__":
     finally:
         test.close()
         print(test.is_connected)
+
+
 
 
 
